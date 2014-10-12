@@ -31,14 +31,14 @@ impl<'a> App<'a>  {
                1  => "",
                 _ => split_path[1]
             };
-
-            //let route_string = String::from_str("/");
-            //let route_slice = route_string.as_slice();
-
-            //let callback: fn() -> &'static str = *self.routes.find(&route).unwrap();
-            let callback: fn() -> &'static str = *self.routes.find(&("/")).unwrap();
-            let content = callback();
-            //let content = format!("<h1>TEST</h1><p>route:{}</p><p>query string:{}</p>",route,query_string);
+            
+            let content = match self.routes.find(&("/")){
+                None => { "404" }
+                Some(callback) => {
+                    let func = *callback;
+                    func()
+                }
+            };
 
             let with_headers = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\ncontent-length: {}\r\n\r\n{}",content.len(),content);
 
