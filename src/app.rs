@@ -14,31 +14,37 @@ impl<'a> App<'a>  {
         }
     }
     
-    fn handle_client<'a>(&self, stream: &'a mut BufferedStream<TcpStream>) -> () {
+    fn handle_client(&self, stream: &mut BufferedStream<TcpStream>) -> () {
             let request:String = match stream.read_line() {
                 Err(e) => { format!("error: {}", e) }
                 Ok(stream_output) => { stream_output }
             };
             println!("{}", request);
             
-            let clone_slice = request.as_slice();
-            let request_parts: Vec<&str> = clone_slice.split(' ').collect();
+            let request_parts: Vec<&str> = request
+                .as_slice()
+                .split(' ')
+                .collect();
             let full_path: &str = request_parts[1];
             
-            let split_path: Vec<&str> = full_path.split('?').collect();
+            let split_path: Vec<&str> = full_path
+                .split('?')
+                .collect();
             let route = split_path[0];
             let query_string = match split_path.len() {
                1  => "",
                 _ => split_path[1]
             };
             
-            let content = match self.routes.find(&("/")){
-                None => { "404" }
-                Some(callback) => {
-                    let func = *callback;
-                    func()
+
+            let mut content = "404";
+            for (r, callback) in self.routes.iter() {
+                if *r == route {
+                    println!("found");
+                    let call_func = *callback;
+                    content = call_func();
                 }
-            };
+            }
 
             let with_headers = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\ncontent-length: {}\r\n\r\n{}",content.len(),content);
 
