@@ -22,8 +22,7 @@ impl<'a> App<'a>  {
             println!("{}", request);
             
             let request_parts: Vec<&str> = request.as_slice().split(' ').collect();
-            let full_path: &str = request_parts[1];
-            
+            let full_path: &str = request_parts[1]; 
             let split_path: Vec<&str> = full_path.split('?').collect();
 
             let route = split_path[0];
@@ -34,7 +33,7 @@ impl<'a> App<'a>  {
                 query_string = "";
             }
              
-            //let callback = self.routes.find(&route).unwrap();
+            let callback = self.routes.find(route).unwrap();
             //let content = callback();
             let content = format!("<h1>TEST</h1><p>route:{}</p><p>query string:{}</p>",route,query_string);
 
