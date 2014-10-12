@@ -32,8 +32,8 @@ impl<'a> App<'a>  {
                 _ => split_path[1]
             };
 
-            let route_string = String::from_str(route);
-            println!("{}", route_string.as_slice());
+            //let route_string = String::from_str("/");
+            //let route_slice = route_string.as_slice();
 
             //let callback: fn() -> &'static str = *self.routes.find(&route).unwrap();
             let callback: fn() -> &'static str = *self.routes.find(&("/")).unwrap();
