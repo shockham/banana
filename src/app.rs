@@ -43,6 +43,7 @@ impl<'a> App<'a>  {
                     println!("found");
                     let call_func = *callback;
                     content = call_func();
+                    break;
                 }
             }
 
