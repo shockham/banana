@@ -14,12 +14,16 @@ impl<'a> App<'a>  {
         }
     }
     
-    fn handle_client(&self, mut stream: BufferedStream<TcpStream>) -> () {
-            let request = stream.read_line().ok().unwrap();
+    fn handle_client(&self, stream: &'a mut BufferedStream<TcpStream>) -> () {
+            let request:String = match stream.read_line() {
+                Err(e) => { format!("error: {}", e) }
+                Ok(stream_output) => { stream_output }
+            };
             println!("{}", request);
+            
             let request_parts: Vec<&str> = request.as_slice().split(' ').collect();
             let full_path: &str = request_parts[1];
-
+            
             let split_path: Vec<&str> = full_path.split('?').collect();
 
             let route = split_path[0];
@@ -29,8 +33,8 @@ impl<'a> App<'a>  {
             }else{
                 query_string = "";
             }
-        
-            let callback = self.routes.find(&route).unwrap();
+             
+            //let callback = self.routes.find(&route).unwrap();
             //let content = callback();
             let content = format!("<h1>TEST</h1><p>route:{}</p><p>query string:{}</p>",route,query_string);
 
@@ -46,15 +50,13 @@ impl<'a> App<'a>  {
 
         println!("||Starting server||{}:{}||", address, port);
 
-
-
         for stream in acceptor.incoming() {
             match stream {
                 Err(e) => { println!("error: {}", e) }
-                Ok(stream) => spawn(proc() {
-                    let buf_stream = BufferedStream::new(stream);
-                    self.handle_client(buf_stream);
-                })
+                Ok(stream) => {//spawn(proc() {
+                    let mut buf_stream = BufferedStream::new(stream);
+                    self.handle_client(&mut buf_stream);
+                }//)
             }
         }
     }
