@@ -22,18 +22,17 @@ impl<'a> App<'a>  {
             println!("{}", request);
             
             let request_parts: Vec<&str> = request.as_slice().split(' ').collect();
-            let full_path: &str = request_parts[1]; 
+            let full_path: &str = request_parts[1];
+            
             let split_path: Vec<&str> = full_path.split('?').collect();
 
             let route = split_path[0];
-            let query_string;
-            if split_path.len() > 1{
-                query_string = split_path[1];
-            }else{
-                query_string = "";
-            }
-             
-            let callback = self.routes.find(route).unwrap();
+            let query_string = match split_path.len() {
+               1  => "",
+                _ => split_path[1]
+            };
+
+            //let callback = self.routes.find(&route).unwrap();
             //let content = callback();
             let content = format!("<h1>TEST</h1><p>route:{}</p><p>query string:{}</p>",route,query_string);
 
