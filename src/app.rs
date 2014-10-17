@@ -35,12 +35,12 @@ impl<'a> App<'a>  {
                1  => "",
                 _ => split_path[1]
             };
+            println!("{}", query_string);
             
 
-            let mut content = "404";
+            let mut content = "Route does not exist";
             for (r, callback) in self.routes.iter() {
                 if *r == route {
-                    println!("found");
                     let call_func = *callback;
                     content = call_func();
                     break;
