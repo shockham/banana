@@ -3,12 +3,20 @@ use std::collections::HashMap;
 use std::io::{TcpListener, TcpStream, BufferedStream};
 use std::io::{Acceptor, Listener};
 
-pub struct App<'a> {
-    pub routes: HashMap<&'a str,fn() -> String>,
+pub struct App {
+    pub routes: HashMap<&'static str,fn() -> String>,
 }
 
-impl<'a> App<'a>  {
-    pub fn new() -> App<'a> {
+impl Clone for App{
+    fn clone(&self) -> App{
+        App{
+            routes: self.routes.clone()
+        }
+    }
+}
+
+impl App  {
+    pub fn new() -> App {
         App{
             routes : HashMap::new()
         }
@@ -63,10 +71,11 @@ impl<'a> App<'a>  {
             match stream {
                 Err(e) => { println!("error: {}", e) }
                 Ok(stream) => {
-                    //spawn(proc() {
+                    let l_app = self.clone();
+                    spawn(proc() {
                         let mut buf_stream = BufferedStream::new(stream);
-                        self.handle_client(&mut buf_stream);
-                    //})
+                        l_app.handle_client(&mut buf_stream);
+                    })
                 }
             }
         }
