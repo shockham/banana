@@ -4,7 +4,7 @@ use std::io::{TcpListener, TcpStream, BufferedStream};
 use std::io::{Acceptor, Listener};
 
 pub struct App<'a> {
-    pub routes: HashMap<&'a str,fn() -> &'static str>,
+    pub routes: HashMap<&'a str,fn() -> String>,
 }
 
 impl<'a> App<'a>  {
@@ -38,7 +38,7 @@ impl<'a> App<'a>  {
             println!("{}", query_string);
             
 
-            let mut content = "Route does not exist";
+            let mut content = String::from_str("Route does not exist");
             for (r, callback) in self.routes.iter() {
                 if *r == route {
                     let call_func = *callback;
