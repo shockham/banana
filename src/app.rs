@@ -1,3 +1,8 @@
+
+extern crate regex;
+
+use self::regex::Regex;
+
 use std::collections::HashMap;
 
 use std::io::{TcpListener, TcpStream, BufferedStream};
@@ -48,7 +53,12 @@ impl App  {
 
             let mut content = String::from_str("Route does not exist");
             for (r, callback) in self.routes.iter() {
-                if *r == route {
+                let re = match Regex::new(*r){
+                    Ok(re) => re,
+                    Err(err) => fail!("{}", err),
+                };
+                let matched = re.is_match(route);
+                if matched {
                     let call_func = *callback;
                     content = call_func();
                     break;

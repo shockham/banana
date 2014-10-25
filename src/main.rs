@@ -10,7 +10,7 @@ fn main() -> () {
         String::from_str("TESTTESTTEST")
     }
 
-    fn another_handler<'a>() -> String{
+    fn another_handler() -> String{
         html("test",
             elem("div", "title", String::from_str("Hello!")) +
             elem("div", "whut",
