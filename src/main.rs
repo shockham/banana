@@ -19,8 +19,8 @@ fn main() -> () {
         )
     }
 
-    a.routes.insert("/", this_handler);
-    a.routes.insert("/bos", another_handler);
+    a.routes.insert("^/$", this_handler);
+    a.routes.insert("/.+", another_handler);
 
-    a.run("127.0.0.1", 8080);
+    a.run("127.0.0.1:8080");
 }

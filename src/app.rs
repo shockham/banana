@@ -55,7 +55,7 @@ impl App  {
             for (r, callback) in self.routes.iter() {
                 let re = match Regex::new(*r){
                     Ok(re) => re,
-                    Err(err) => fail!("{}", err),
+                    Err(err) => panic!("{}", err),
                 };
                 let matched = re.is_match(route);
                 if matched {
@@ -71,11 +71,11 @@ impl App  {
             println!("-> {}", outcome);
     }
 
-    pub fn run(&self, address:&str, port:u16) -> () {
+    pub fn run(&self, address:&str) -> () {
 
-        let mut acceptor = TcpListener::bind(address, port).listen();
+        let mut acceptor = TcpListener::bind(address).listen();
 
-        println!("||Starting server||{}:{}||", address, port);
+        println!("||Starting server||\n{}", address);
 
         for stream in acceptor.incoming() {
             match stream {
