@@ -20,7 +20,7 @@ fn main() -> () {
     }
 
     a.routes.insert("^/$", this_handler);
-    a.routes.insert("/.+", another_handler);
+    a.routes.insert("/(?P<title>[^']+)", another_handler);
 
     a.run("127.0.0.1:8080");
 }

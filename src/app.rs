@@ -1,4 +1,3 @@
-
 extern crate regex;
 
 use self::regex::Regex;
@@ -34,11 +33,12 @@ impl App  {
             };
             println!("{}", request);
             
-            let request_parts: Vec<&str> = request
-                .as_slice()
-                .split(' ')
-                .collect();
-            let full_path: &str = request_parts[1];
+            let req_re = match Regex::new("(?P<type>[^']+) (?P<route>[^']+) (?P<http>[^']+)"){
+                Ok(re) => re,
+                Err(err) => panic!("{}", err),
+            };
+            let caps = req_re.captures(request.as_slice()).unwrap();
+            let full_path: &str = caps.name("route");
             
             let split_path: Vec<&str> = full_path
                 .split('?')
