@@ -8,7 +8,12 @@ use std::io::{TcpListener, TcpStream, BufferedStream};
 use std::io::{Acceptor, Listener};
 
 pub struct App {
-    pub routes: HashMap<&'static str,fn() -> String>,
+    pub routes: HashMap<&'static str,fn(req:Request) -> String>,
+}
+
+pub struct Request {
+    pub method: String,
+    pub query_string: String,
 }
 
 impl Clone for App{
@@ -39,6 +44,7 @@ impl App  {
             };
             let caps = req_re.captures(request.as_slice()).unwrap();
             let full_path: &str = caps.name("route");
+            let req_type: &str = caps.name("type");
             
             let split_path: Vec<&str> = full_path
                 .split('?')
@@ -49,6 +55,11 @@ impl App  {
                 _ => split_path[1]
             };
             println!("{}", query_string);
+
+            let req = Request {
+                method: String::from_str(req_type),
+                query_string: String::from_str(query_string),
+            };
             
 
             let mut content = String::from_str("Route does not exist");
@@ -60,7 +71,7 @@ impl App  {
                 let matched = re.is_match(route);
                 if matched {
                     let call_func = *callback;
-                    content = call_func();
+                    content = call_func(req);
                     break;
                 }
             }
