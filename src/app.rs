@@ -13,7 +13,7 @@ pub struct App {
 
 pub struct Request {
     pub method: String,
-    pub query_string: String,
+    pub query_string: HashMap<String, String>,
 }
 
 impl Clone for App{
@@ -54,13 +54,21 @@ impl App  {
                1  => "",
                 _ => split_path[1]
             };
-            println!("{}", query_string);
+
+            let query_pairs: Vec<&str> = query_string.split('&').collect();
+            let mut query_map: HashMap<String, String> = HashMap::new();
+            for pairs in query_pairs.iter() {
+                let split_pairs: Vec<&str> = pairs.split('=').collect();
+                if split_pairs.len() < 2 {
+                    continue;
+                }
+                query_map.insert(String::from_str(split_pairs[0]), String::from_str(split_pairs[1]));
+            }
 
             let req = Request {
                 method: String::from_str(req_type),
-                query_string: String::from_str(query_string),
+                query_string: query_map.clone(),
             };
-            
 
             let mut content = String::from_str("Route does not exist");
             for (r, callback) in self.routes.iter() {

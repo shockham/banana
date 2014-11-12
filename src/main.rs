@@ -11,11 +11,16 @@ fn main() -> () {
     }
 
     fn another_handler(req:Request) -> String{
+        let name:String = match req.query_string.get(&String::from_str("name")) {
+            Some(n) => n.clone(),
+            None => String::from_str("anonymous"),
+        };
+
         html("test",
             elem("h1", "title", String::from_str("Hello!")) +
             elem("div", "container",
                 elem("p", "", req.method) +
-                elem("p", "", req.query_string) 
+                elem("p", "", name) 
             )
         )
     }
