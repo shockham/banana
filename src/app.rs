@@ -14,6 +14,7 @@ pub struct App {
 pub struct Request {
     pub method: String,
     pub query_string: HashMap<String, String>,
+    pub route: String,
 }
 
 impl Clone for App{
@@ -30,14 +31,8 @@ impl App  {
             routes : HashMap::new()
         }
     }
-    
-    fn handle_client(&self, stream: &mut BufferedStream<TcpStream>) -> () {
-            let request:String = match stream.read_line() {
-                Err(e) => { format!("error: {}", e) }
-                Ok(stream_output) => { stream_output }
-            };
-            println!("{}", request);
-            
+
+    fn process_request(request:String) -> Request {
             let req_re = match Regex::new("(?P<type>[^']+) (?P<route>[^']+) (?P<http>[^']+)"){
                 Ok(re) => re,
                 Err(err) => panic!("{}", err),
@@ -46,9 +41,7 @@ impl App  {
             let full_path: &str = caps.name("route");
             let req_type: &str = caps.name("type");
             
-            let split_path: Vec<&str> = full_path
-                .split('?')
-                .collect();
+            let split_path: Vec<&str> = full_path.split('?').collect();
             let route = split_path[0];
             let query_string = match split_path.len() {
                1  => "",
@@ -65,10 +58,21 @@ impl App  {
                 query_map.insert(String::from_str(split_pairs[0]), String::from_str(split_pairs[1]));
             }
 
-            let req = Request {
+            Request {
                 method: String::from_str(req_type),
                 query_string: query_map.clone(),
+                route: String::from_str(route),
+            }
+    }
+    
+    fn handle_client(&self, stream: &mut BufferedStream<TcpStream>) -> () {
+            let request:String = match stream.read_line() {
+                Err(e) => { format!("error: {}", e) }
+                Ok(stream_output) => { stream_output }
             };
+            println!("{}", request);
+            
+            let req:Request = App::process_request(request); 
 
             let mut content = String::from_str("Route does not exist");
             for (r, callback) in self.routes.iter() {
@@ -76,7 +80,7 @@ impl App  {
                     Ok(re) => re,
                     Err(err) => panic!("{}", err),
                 };
-                let matched = re.is_match(route);
+                let matched = re.is_match(req.route.as_slice());
                 if matched {
                     let call_func = *callback;
                     content = call_func(req);
@@ -86,8 +90,10 @@ impl App  {
 
             let with_headers = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\ncontent-length: {}\r\n\r\n{}",content.len(),content);
 
-            let outcome = stream.write_str(with_headers.as_slice());
-            println!("-> {}", outcome);
+            match stream.write_str(with_headers.as_slice()){
+                Ok(o) => println!(":{}", o),
+                Err(e) => panic!("{}", e),
+            }
     }
 
     pub fn run(&self, address:&str) -> () {
