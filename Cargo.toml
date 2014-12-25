@@ -3,3 +3,8 @@
 name = "banana_rs"
 version = "0.0.1"
 authors = ["shockham <samuel.hockham@gmail.com>"]
+
+[dependencies.temple]
+git = "https://github.com/shockham/temple.git"
+
+

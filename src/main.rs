@@ -1,7 +1,9 @@
+extern crate temple;
+
+use temple::{html, elem};
 use app::{App, Request};
-use html::{html, elem};
+
 pub mod app;
-pub mod html;
 
 fn main() -> () {
     let mut a = App::new();
