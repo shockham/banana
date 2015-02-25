@@ -7,4 +7,7 @@ authors = ["shockham <samuel.hockham@gmail.com>"]
 [dependencies.temple]
 git = "https://github.com/shockham/temple.git"
 
+[dependencies]
+regex = "0.1.8"
+
 

@@ -8,7 +8,7 @@ pub mod app;
 fn main() -> () {
     let mut a = App::new();
 
-    fn this_handler(req:Request) -> String{
+    fn this_handler(_:Request) -> String{
         String::from_str("TESTTESTTEST")
     }
 
@@ -22,9 +22,10 @@ fn main() -> () {
             elem("h1", "title", String::from_str("Hello!")) +
             elem("div", "container",
                 elem("p", "", req.method) +
-                elem("p", "", name) 
-            )
+                elem("p", "", name).as_slice()
+            ).as_slice()
         )
+        //html("hello", String::from_str("content"))
     }
 
     a.routes.insert("^/$", this_handler); 

@@ -4,8 +4,9 @@ use self::regex::Regex;
 
 use std::collections::HashMap;
 
-use std::io::{TcpListener, TcpStream, BufferedStream};
-use std::io::{Acceptor, Listener};
+use std::net::{TcpListener, TcpStream};
+use std::thread;
+use std::io::prelude::*;
 
 pub struct App {
     pub routes: HashMap<&'static str,fn(req:Request) -> String>,
@@ -33,13 +34,13 @@ impl App  {
     }
 
     fn process_request(request:String) -> Request {
-            let req_re = match Regex::new("(?P<type>[^']+) (?P<route>[^']+) (?P<http>[^']+)"){
+            let req_re = match Regex::new("(?P<type>[A-Z^']+) (?P<route>[^']+) HTTP/(?P<http>[^']+)"){
                 Ok(re) => re,
                 Err(err) => panic!("{}", err),
             };
             let caps = req_re.captures(request.as_slice()).unwrap();
-            let full_path: &str = caps.name("route");
-            let req_type: &str = caps.name("type");
+            let full_path: &str = caps.name("route").unwrap();
+            let req_type: &str = caps.name("type").unwrap();
             
             let split_path: Vec<&str> = full_path.split('?').collect();
             let route = split_path[0];
@@ -65,12 +66,11 @@ impl App  {
             }
     }
     
-    fn handle_client(&self, stream: &mut BufferedStream<TcpStream>) -> () {
-            let request:String = match stream.read_line() {
-                Err(e) => { format!("error: {}", e) }
-                Ok(stream_output) => { stream_output }
-            };
-            println!("{}", request);
+    fn handle_client(&self, stream: &mut TcpStream) -> () {
+            let mut request:String = String::from_str("GET /test?name=jef HTTP/1.1");
+            //let _ = stream.read_to_string(&mut request).unwrap();
+ 
+            println!("\n{}\n", request);
             
             let req:Request = App::process_request(request); 
 
@@ -90,15 +90,17 @@ impl App  {
 
             let with_headers = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\ncontent-length: {}\r\n\r\n{}",content.len(),content);
 
-            match stream.write_str(with_headers.as_slice()){
-                Ok(o) => println!(":{}", o),
+            println!("\n{}", with_headers);
+
+            match stream.write_all(with_headers.as_slice().as_bytes()){
+                Ok(_) => println!("ok"),
                 Err(e) => panic!("{}", e),
             }
     }
 
     pub fn run(&self, address:&str) -> () {
 
-        let mut acceptor = TcpListener::bind(address).listen();
+        let acceptor = TcpListener::bind(address).unwrap();
 
         println!("||Starting server||\n{}", address);
 
@@ -107,10 +109,11 @@ impl App  {
                 Err(e) => { println!("error: {}", e) }
                 Ok(stream) => {
                     let l_app = self.clone();
-                    spawn(proc() {
-                        let mut buf_stream = BufferedStream::new(stream);
-                        l_app.handle_client(&mut buf_stream);
-                    })
+                    thread::spawn(move || {
+                        let mut mut_stream = stream;
+                        //mut_stream.write_all("YO!".as_bytes());
+                        l_app.handle_client(&mut mut_stream);
+                    });
                 }
             }
         }
