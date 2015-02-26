@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 use std::io::prelude::*;
+use std::str;
 
 pub struct App {
     pub routes: HashMap<&'static str,fn(req:Request) -> String>,
@@ -67,9 +68,14 @@ impl App  {
     }
     
     fn handle_client(&self, stream: &mut TcpStream) -> () {
-            let mut request:String = String::from_str("GET /test?name=jef HTTP/1.1");
+            //let mut request:String = String::from_str("GET /test?name=jef HTTP/1.1");
             //let _ = stream.read_to_string(&mut request).unwrap();
- 
+            
+            let mut byte_req: [u8; 1024] = [0; 1024];
+            let _ = stream.read(&mut byte_req).unwrap();
+            
+            let request:String = str::from_utf8(&byte_req).unwrap().to_string();
+
             println!("\n{}\n", request);
             
             let req:Request = App::process_request(request); 
