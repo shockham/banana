@@ -91,19 +91,18 @@ impl App  {
             let with_headers = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\ncontent-length: {}\r\n\r\n{}",content.len(),content);
 
             match stream.write_all(with_headers.as_slice().as_bytes()){
-                Ok(_) => println!("ok"),
+                Ok(_) => return,
                 Err(e) => panic!("{}", e),
             }
     }
 
     pub fn run(&self, address:&str) -> () {
-
         let acceptor = match TcpListener::bind(address){
             Ok(acc) => acc,
             Err(e) => panic!("{}", e),
         };
 
-        println!("||Starting server||\n{}", address);
+        println!("||Starting server||\nhttp://{}", address);
 
         for stream in acceptor.incoming() {
             match stream {
@@ -117,5 +116,7 @@ impl App  {
                 }
             }
         }
+
+        drop(acceptor);
     }
 }
