@@ -98,7 +98,10 @@ impl App  {
 
     pub fn run(&self, address:&str) -> () {
 
-        let acceptor = TcpListener::bind(address).unwrap();
+        let acceptor = match TcpListener::bind(address){
+            Ok(acc) => acc,
+            Err(e) => panic!("{}", e),
+        };
 
         println!("||Starting server||\n{}", address);
 
