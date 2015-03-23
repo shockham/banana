@@ -67,17 +67,11 @@ impl App  {
             }
     }
     
-    fn handle_client(&self, stream: &mut TcpStream) -> () {
-            //let mut request:String = String::from_str("GET /test?name=jef HTTP/1.1");
-            //let _ = stream.read_to_string(&mut request).unwrap();
-            
+    fn handle_client(&self, stream: &mut TcpStream) -> () { 
             let mut byte_req: [u8; 1024] = [0; 1024];
             let _ = stream.read(&mut byte_req).unwrap();
             
             let request:String = str::from_utf8(&byte_req).unwrap().to_string();
-
-            println!("\n{}\n", request);
-            
             let req:Request = App::process_request(request); 
 
             let mut content = String::from_str("Route does not exist");
@@ -95,8 +89,6 @@ impl App  {
             }
 
             let with_headers = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\ncontent-length: {}\r\n\r\n{}",content.len(),content);
-
-            println!("\n{}", with_headers);
 
             match stream.write_all(with_headers.as_slice().as_bytes()){
                 Ok(_) => println!("ok"),
@@ -117,7 +109,6 @@ impl App  {
                     let l_app = self.clone();
                     thread::spawn(move || {
                         let mut mut_stream = stream;
-                        //mut_stream.write_all("YO!".as_bytes());
                         l_app.handle_client(&mut mut_stream);
                     });
                 }

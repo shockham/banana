@@ -25,7 +25,6 @@ fn main() -> () {
                 elem("p", "", name).as_slice()
             ).as_slice()
         )
-        //html("hello", String::from_str("content"))
     }
 
     a.routes.insert("^/$", this_handler); 
