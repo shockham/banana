@@ -39,7 +39,7 @@ impl App  {
                 Ok(re) => re,
                 Err(err) => panic!("{}", err),
             };
-            let caps = req_re.captures(request.as_slice()).unwrap();
+            let caps = req_re.captures(request.as_str()).unwrap();
             let full_path: &str = caps.name("route").unwrap();
             let req_type: &str = caps.name("type").unwrap();
             
@@ -80,7 +80,7 @@ impl App  {
                     Ok(re) => re,
                     Err(err) => panic!("{}", err),
                 };
-                let matched = re.is_match(req.route.as_slice());
+                let matched = re.is_match(req.route.as_str());
                 if matched {
                     let call_func = *callback;
                     content = call_func(req);
@@ -90,7 +90,7 @@ impl App  {
 
             let with_headers = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\ncontent-length: {}\r\n\r\n{}",content.len(),content);
 
-            match stream.write_all(with_headers.as_slice().as_bytes()){
+            match stream.write_all(with_headers.as_str().as_bytes()){
                 Ok(_) => return,
                 Err(e) => panic!("{}", e),
             }

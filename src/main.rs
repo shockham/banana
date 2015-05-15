@@ -1,3 +1,6 @@
+#![feature(convert)]
+#![feature(collections)]
+
 extern crate temple;
 
 use temple::{html, elem};
@@ -9,21 +12,21 @@ fn main() -> () {
     let mut a = App::new();
 
     fn this_handler(_:Request) -> String{
-        String::from_str("TESTTESTTEST")
+        "TESTTESTTEST".to_string()
     }
 
     fn another_handler(req:Request) -> String{
-        let name:String = match req.query_string.get(&String::from_str("name")) {
+        let name:String = match req.query_string.get(&"name".to_string()) {
             Some(n) => n.clone(),
             None => String::from_str("anonymous"),
         };
 
         html("test",
-            elem("h1", "title", String::from_str("Hello!")) +
+            elem("h1", "title", "Hello!".to_string()) +
             elem("div", "container",
                 elem("p", "", req.method) +
-                elem("p", "", name).as_slice()
-            ).as_slice()
+                elem("p", "", name).as_str()
+            ).as_str()
         )
     }
 
