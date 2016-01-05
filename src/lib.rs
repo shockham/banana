@@ -1,3 +1,5 @@
+#![feature(convert)]
+
 extern crate regex;
 
 use self::regex::Regex;
@@ -57,13 +59,13 @@ impl App  {
                 if split_pairs.len() < 2 {
                     continue;
                 }
-                query_map.insert(String::from_str(split_pairs[0]), String::from_str(split_pairs[1]));
+                query_map.insert(split_pairs[0].to_string(), split_pairs[1].to_string());
             }
 
             Request {
-                method: String::from_str(req_type),
+                method: req_type.to_string(),
                 query_string: query_map.clone(),
-                route: String::from_str(route),
+                route: route.to_string(),
             }
     }
     
@@ -74,7 +76,7 @@ impl App  {
             let request:String = str::from_utf8(&byte_req).unwrap().to_string();
             let req:Request = App::process_request(request); 
 
-            let mut content = String::from_str("Route does not exist");
+            let mut content = "Route does not exist".to_string();
             for (r, callback) in self.routes.iter() {
                 let re = match Regex::new(*r){
                     Ok(re) => re,

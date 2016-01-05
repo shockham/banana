@@ -1,12 +1,10 @@
 #![feature(convert)]
-#![feature(collections)]
 
 extern crate temple;
+extern crate banana_rs;
 
 use temple::{html, elem};
-use app::{App, Request};
-
-pub mod app;
+use banana_rs::{App, Request};
 
 fn main() -> () {
     let mut a = App::new();
@@ -18,7 +16,7 @@ fn main() -> () {
     fn another_handler(req:Request) -> String{
         let name:String = match req.query_string.get(&"name".to_string()) {
             Some(n) => n.clone(),
-            None => String::from_str("anonymous"),
+            None => "anonymous".to_string(),
         };
 
         html("test",
