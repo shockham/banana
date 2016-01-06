@@ -9,5 +9,6 @@ git = "https://github.com/shockham/temple.git"
 
 [dependencies]
 regex = "0.1.8"
+bufstream = "*"
 
 
