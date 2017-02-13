@@ -92,8 +92,8 @@ impl App  {
         let req_re = Regex::new("(?P<type>[A-Z^']+) (?P<route>[^']+) HTTP/(?P<http>[^']+)").unwrap();
         let (full_path, req_type) = match req_re.captures(request.as_str()) {
             Some(caps) => {
-                let full_path = caps.name("route").unwrap_or("/");
-                let req_type = caps.name("type").unwrap_or("GET");
+                let full_path = caps.name("route").unwrap().as_str();
+                let req_type = caps.name("type").unwrap().as_str();
                 (full_path, req_type)
             },
             None => {

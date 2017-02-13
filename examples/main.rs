@@ -1,7 +1,5 @@
-extern crate temple;
 extern crate banana;
 
-use temple::{html, elem};
 use banana::{App, Request, Response};
 
 fn main() -> () {
@@ -17,15 +15,7 @@ fn main() -> () {
             None => "anonymous".to_string(),
         };
 
-        Response::ok_html(
-            html("test",
-                 elem("h1", "title", "Hello!".to_string()) +
-                 elem("div", "container",
-                      elem("p", "", req.method) +
-                      elem("p", "", name).as_str()
-                     ).as_str()
-                )
-            )
+        Response::ok_html(format!("Hello {}", name))
     }
 
     a.routes.insert("^/$", this_handler); 

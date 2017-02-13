@@ -1,12 +1,13 @@
 [package]
-
 name = "banana"
 version = "0.0.1"
 authors = ["shockham <samuel.hockham@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/shockham/banana"
+homepage = "https://github.com/shockham/banana"
+description = "web micro framework"
 
 [dependencies]
-regex = "*"
-bufstream = "*"
-
-[dev-dependencies]
-temple = { git = "https://github.com/shockham/temple.git" }
+regex = "0.2"
+bufstream = "0.1"
