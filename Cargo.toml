@@ -1,6 +1,6 @@
 [package]
 name = "banana"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["shockham <samuel.hockham@gmail.com>"]
 license = "MIT"
 readme = "README.md"
@@ -12,3 +12,4 @@ description = "web micro framework"
 regex = "0.2"
 bufstream = "0.1"
 lazy_static = "0.2.2"
+num_cpus = "1.2.1"

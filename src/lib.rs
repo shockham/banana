@@ -1,4 +1,5 @@
 extern crate regex;
+extern crate num_cpus;
 extern crate bufstream;
 #[macro_use] extern crate lazy_static;
 
@@ -147,17 +148,17 @@ impl App  {
     }
 
     pub fn run(&self, address:&str) -> () {
-        const WORKER_NO:i32 = 8;
+        let worker_no = num_cpus::get();
 
         let listener = TcpListener::bind(address).unwrap();
-        println!("||Starting server||:press Ctrl-c to close\nhttp://{}", address);
+        println!("||Starting server: http://{}\n||workers: {}\npress Ctrl-c to close", address, worker_no);
 
         //vec of the incoming streams
         let streams:Vec<TcpStream> = Vec::new();
         let data = Arc::new(Mutex::new(streams));
 
         //spawn some worker threads
-        for _ in 0..WORKER_NO {
+        for _ in 0..worker_no {
             let data = data.clone();
             let l_app = self.clone();
             thread::spawn(move || {
