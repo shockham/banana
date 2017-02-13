@@ -1,5 +1,6 @@
 extern crate regex;
 extern crate bufstream;
+#[macro_use] extern crate lazy_static;
 
 use regex::Regex;
 use bufstream::BufStream;
@@ -89,15 +90,18 @@ impl App  {
     }
 
     fn process_request(request:String) -> Request {
-        let req_re = Regex::new("(?P<type>[A-Z^']+) (?P<route>[^']+) HTTP/(?P<http>[^']+)").unwrap();
-        let (full_path, req_type) = match req_re.captures(request.as_str()) {
+        lazy_static! {
+            static ref REQ_RE: Regex = Regex::new("(?P<type>[A-Z^']+) (?P<route>[^']+) HTTP/(?P<http>[^']+)").unwrap();
+        }
+        let (full_path, req_type) = match REQ_RE.captures(request.as_str()) {
             Some(caps) => {
                 let full_path = caps.name("route").unwrap().as_str();
                 let req_type = caps.name("type").unwrap().as_str();
                 (full_path, req_type)
             },
             None => {
-                println!("falling back to default\nreq:{}", request);
+                println!("req:{}", request);
+                println!("err:falling back to default");
                 ("/", "GET")
             }
         };
@@ -139,17 +143,14 @@ impl App  {
         let request:String = str::from_utf8(&byte_req).unwrap().to_string();
         let req:Request = App::process_request(request); 
 
-        let content = self.route(req);
-
-
-        stream.write_all(content.create().as_bytes()).unwrap();
+        stream.write_all(self.route(req).create().as_bytes()).unwrap();
     }
 
     pub fn run(&self, address:&str) -> () {
         const WORKER_NO:i32 = 8;
 
         let listener = TcpListener::bind(address).unwrap();
-        println!("||Starting server||\nhttp://{}", address);
+        println!("||Starting server||:press Ctrl-c to close\nhttp://{}", address);
 
         //vec of the incoming streams
         let streams:Vec<TcpStream> = Vec::new();
