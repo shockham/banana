@@ -1,10 +1,8 @@
 extern crate regex;
 extern crate num_cpus;
-extern crate bufstream;
 #[macro_use] extern crate lazy_static;
 
 use regex::Regex;
-use bufstream::BufStream;
 
 use std::collections::HashMap;
 use std::net::{TcpListener, TcpStream};
@@ -137,7 +135,7 @@ impl App  {
         }
     }
 
-    fn handle_client(&self, stream: &mut BufStream<TcpStream>) { 
+    fn handle_client(&self, stream: &mut TcpStream) { 
         let mut byte_req: [u8; 1024] = [0; 1024];
         let _ = stream.read(&mut byte_req).unwrap();
 
@@ -173,8 +171,8 @@ impl App  {
 
                     let _ = match data.pop() {
                         Some(s) => {
-                            let mut stream = BufStream::new(s);
-                            l_app.handle_client(&mut stream)
+                            let mut stream = s;
+                            l_app.handle_client(&mut stream);
                         },
                         None => (),
                     };
