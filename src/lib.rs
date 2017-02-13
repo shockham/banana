@@ -22,14 +22,33 @@ pub struct Request {
 }
 
 pub enum ResponseCode {
+    // 200
     Ok,
+    // 400
+    BadRequest,
+    Unauthorised,
+    Forbidden,
     NotFound,
+    MethodNotAllowed,
+    // 500
+    InternalServerError,
+    NotImplemented,
+    BadGateway,
+    ServiceUnavailable,
 }
 
 fn response_code_str(code:&ResponseCode) -> &'static str {
     match *code {
         ResponseCode::Ok => "200 OK",
+        ResponseCode::BadRequest => "400 Bad Request",
+        ResponseCode::Unauthorised => "401 Unauthorized",
+        ResponseCode::Forbidden => "403 Forbidden",
         ResponseCode::NotFound => "404 Not Found",
+        ResponseCode::MethodNotAllowed => "405 Method Not Allowed",
+        ResponseCode::InternalServerError => "500 Internal Server Error",
+        ResponseCode::NotImplemented => "501 Not Implemented",
+        ResponseCode::BadGateway => "502 Bad Gateway",
+        ResponseCode::ServiceUnavailable => "503 Service Unavailable",
     }
 }
 
