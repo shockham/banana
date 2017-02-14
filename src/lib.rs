@@ -11,16 +11,14 @@ use std::io::prelude::*;
 use std::sync::{Arc, Mutex};
 use std::str;
 
-pub struct App {
-    pub routes: HashMap<&'static str,fn(req:Request) -> Response>,
-}
-
+/// Data related to a request1
 pub struct Request {
     pub method: String,
     pub query_string: HashMap<String, String>,
     pub route: String,
 }
 
+/// HTTP response codes
 pub enum ResponseCode {
     // 200
     Ok,
@@ -37,6 +35,7 @@ pub enum ResponseCode {
     ServiceUnavailable,
 }
 
+/// Converts ResponseCode enum unto the str required in a http response
 fn response_code_str(code:&ResponseCode) -> &'static str {
     match *code {
         ResponseCode::Ok => "200 OK",
@@ -52,6 +51,7 @@ fn response_code_str(code:&ResponseCode) -> &'static str {
     }
 }
 
+/// Data related to a response
 pub struct Response {
     pub code: ResponseCode,
     pub content: String,
@@ -59,16 +59,18 @@ pub struct Response {
 }
 
 impl Response {
+    /// Helper function for creating an Ok response with html mimetype
     pub fn ok_html(content: String) -> Response {
         Response {
             code: ResponseCode::Ok,
             content: content,
-            mimetype: "text/plain; charset=utf-8",
+            mimetype: "text/html; charset=utf-8",
         }
     }
 }
 
 impl Response {
+    /// Renders the Response to a string for sending
     pub fn create(&self) -> String {
         format!("HTTP/1.1 {}\r\nContent-Type: {}\r\ncontent-length: {}\r\n\r\n{}", 
                 response_code_str(&self.code),
@@ -78,7 +80,13 @@ impl Response {
     }
 }
 
+/// Definition of an app
+pub struct App {
+    pub routes: HashMap<&'static str,fn(req:Request) -> Response>,
+}
+
 impl Clone for App{
+    /// Creates a copy of the app 
     fn clone(&self) -> App{
         App{
             routes: self.routes.clone()
@@ -87,12 +95,14 @@ impl Clone for App{
 }
 
 impl App  {
+    /// Creates a new instance of an app
     pub fn new() -> App {
         App{
             routes : HashMap::new()
         }
     }
 
+    /// Converts a query string into a HashMap
     fn create_query_map(query_string:&str) -> HashMap<String, String> {
         let query_pairs: Vec<&str> = query_string.split('&').collect();
         let mut query_map: HashMap<String, String> = HashMap::new();
@@ -107,6 +117,7 @@ impl App  {
         query_map
     }
 
+    /// Processes a request into a Request
     fn process_request(request:String) -> Request {
         lazy_static! {
             static ref REQ_RE: Regex = Regex::new("(?P<type>[A-Z^']+) (?P<route>[^']+) HTTP/(?P<http>[^']+)").unwrap();
@@ -138,6 +149,7 @@ impl App  {
         }
     }
 
+    /// Routes a request to the correct callback based on Regex
     fn route(&self, req:Request) -> Response {
         for (r, callback) in self.routes.iter() {
             let re = Regex::new(*r).unwrap();
@@ -154,6 +166,7 @@ impl App  {
         }
     }
 
+    /// Handles the connecting client dealing with the Request and writing the Response
     fn handle_client(&self, stream: &mut TcpStream) { 
         let mut byte_req: [u8; 1024] = [0; 1024];
         let _ = stream.read(&mut byte_req).unwrap();
@@ -164,6 +177,7 @@ impl App  {
         stream.write_all(self.route(req).create().as_bytes()).unwrap();
     }
 
+    /// Starts the app at a particular address
     pub fn run(&self, address:&str) -> () {
         let worker_no = num_cpus::get();
 
