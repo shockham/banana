@@ -9,6 +9,6 @@ homepage = "https://github.com/shockham/banana"
 description = "web micro framework"
 
 [dependencies]
-regex = "0.2"
-lazy_static = "0.2.2"
+regex = "1.7"
+lazy_static = "1.4"
 num_cpus = "1.2.1"
