@@ -2,4 +2,3 @@ main
 **/.DS_Store
 **/*.swp
 target
-Cargo.lock
